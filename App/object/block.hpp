@@ -15,6 +15,8 @@ class Block : public sf::Drawable
         Block& setColor(sf::Color color) { m_shape.setFillColor(color); return *this; }
         Block& setSize(sf::Vector2f size) { m_shape.setSize(size); return *this; }
         
+        void move(sf::Vector2f offset) { m_shape.move(offset); }
+        
         sf::Vector2f getPosition() { return m_shape.getPosition(); }
         sf::Color getColor() { return m_shape.getFillColor(); }
         sf::Vector2f getSize() { return m_shape.getSize(); }
@@ -25,5 +27,19 @@ class BlockCluster : public sf::Drawable
     private:
         std::vector<Block> m_blocks;
     public:
+        enum class Shape
+        {
+            rectangle, line, l, l_reverse, t, z, z_reverse
+        };
         
+    public:
+        void create(Shape shape, sf::Vector2f position, float size = 50);
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+        void move(sf::Vector2f offset)
+        {
+            for (auto & block : m_blocks)
+                block.move(offset);
+        }
+        float getSize() { return m_blocks[0].getSize().x; }
+
 };
