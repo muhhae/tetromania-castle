@@ -5,24 +5,23 @@ void Block::draw(sf::RenderTarget & target, sf::RenderStates states) const
     target.draw(m_shape);
 } 
 
-void BlockCluster::create(Shape shape, sf::Vector2f position, sf::Color color, float size)
+void BlockCluster::create()
 {
     m_blocks.clear();
-    
     Block block;
     
-    if (shape == Shape::z_reverse) position.x += size;
+    if (m_shape == Shape::z_reverse) m_position.x += m_size;
     
-    block.setSize(sf::Vector2f(size, size))
-         .setColor(color)
-         .setPosition(position);
+    block.setSize(sf::Vector2f(m_size, m_size))
+         .setColor(m_color)
+         .setPosition(m_position);
          
     for (int i = 0; i < 4; i++)
     {
         m_blocks.push_back(block);
     }
          
-    switch (shape)
+    switch (m_shape)
     {
     case Shape::line:
         for (int i = 0; i < 4; i++)
@@ -36,34 +35,34 @@ void BlockCluster::create(Shape shape, sf::Vector2f position, sf::Color color, f
         }
         break;
     case Shape::l:
-        m_blocks[1].move(sf::Vector2f(0, size));
-        m_blocks[2].move(sf::Vector2f(0, size * 2));
-        m_blocks[3].move(sf::Vector2f(size, size * 2));
+        m_blocks[1].move(sf::Vector2f(0, m_size));
+        m_blocks[2].move(sf::Vector2f(0, m_size * 2));
+        m_blocks[3].move(sf::Vector2f(m_size, m_size * 2));
         break;
     case Shape::l_reverse:
-        m_blocks[1].move(sf::Vector2f(0, size));
-        m_blocks[2].move(sf::Vector2f(0, size * 2));
-        m_blocks[3].move(sf::Vector2f(-size, size * 2));
+        m_blocks[1].move(sf::Vector2f(0, m_size));
+        m_blocks[2].move(sf::Vector2f(0, m_size * 2));
+        m_blocks[3].move(sf::Vector2f(-m_size, m_size * 2));
         break;
     case Shape::rectangle:
-        m_blocks[1].move(sf::Vector2f(size, 0));
-        m_blocks[2].move(sf::Vector2f(0, size));
-        m_blocks[3].move(sf::Vector2f(size, size));
+        m_blocks[1].move(sf::Vector2f(m_size, 0));
+        m_blocks[2].move(sf::Vector2f(0, m_size));
+        m_blocks[3].move(sf::Vector2f(m_size, m_size));
         break;
     case Shape::t:
-        m_blocks[1].move(sf::Vector2f(size, 0));
-        m_blocks[2].move(sf::Vector2f(2 * size, 0));
-        m_blocks[3].move(sf::Vector2f(size, size));
+        m_blocks[1].move(sf::Vector2f(m_size, 0));
+        m_blocks[2].move(sf::Vector2f(2 * m_size, 0));
+        m_blocks[3].move(sf::Vector2f(m_size, m_size));
         break;
     case Shape::z:
-        m_blocks[1].move(sf::Vector2f(size, 0));
-        m_blocks[2].move(sf::Vector2f(size, size));
-        m_blocks[3].move(sf::Vector2f(size * 2, size));
+        m_blocks[1].move(sf::Vector2f(m_size, 0));
+        m_blocks[2].move(sf::Vector2f(m_size, m_size));
+        m_blocks[3].move(sf::Vector2f(m_size * 2, m_size));
         break;
     case Shape::z_reverse:
-        m_blocks[1].move(sf::Vector2f(-size, 0));
-        m_blocks[2].move(sf::Vector2f(-size, size));
-        m_blocks[3].move(sf::Vector2f(-size * 2, size));
+        m_blocks[1].move(sf::Vector2f(-m_size, 0));
+        m_blocks[2].move(sf::Vector2f(-m_size, m_size));
+        m_blocks[3].move(sf::Vector2f(-m_size * 2, m_size));
         break;
     default:
         break;
@@ -71,8 +70,18 @@ void BlockCluster::create(Shape shape, sf::Vector2f position, sf::Color color, f
     
 }
 
+void BlockCluster::move(sf::Vector2f offset)
+{
+    m_position += offset;
+    for (auto & block : m_blocks)
+        block.move(offset);
+}
+
+
 void BlockCluster::rotate()
 {
+    if (Shape::rectangle == m_shape) return;
+    
     sf::Vector2f center = m_blocks[1].getPosition();
     
     for (auto & block : m_blocks)

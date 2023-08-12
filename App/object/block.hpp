@@ -24,27 +24,38 @@ class Block : public sf::Drawable
 
 class BlockCluster : public sf::Drawable
 {
-    private:
-        std::vector<Block> m_blocks;
+        
     public:
         enum class Shape
         {
             rectangle, line, l, l_reverse, t, z, z_reverse, 
             MAX
         };
-        
+    private:
+        std::vector<Block> m_blocks;
+        Shape m_shape;
+        float m_size;
+        sf::Color m_color;
+        sf::Vector2f m_position;
     public:
-        void create(Shape shape = Shape::rectangle, 
-                    sf::Vector2f position = sf::Vector2f(0, 0),
-                    sf::Color color = sf::Color::Red, 
-                    float size = 50);
+        BlockCluster() : m_position(sf::Vector2f(0, 0)),
+                         m_color(sf::Color::Red),
+                         m_shape(Shape::rectangle),
+                         m_size(50) {};
+        void create();
         void draw(sf::RenderTarget& target, sf::RenderStates states) const;
         void rotate();
-        void move(sf::Vector2f offset)
-        {
-            for (auto & block : m_blocks)
-                block.move(offset);
-        }
-        float getSize() { return m_blocks[0].getSize().x; }
+        void move(sf::Vector2f offset);
+        
+        BlockCluster& setPosition(sf::Vector2f position) { m_position = position; return *this; }
+        BlockCluster& setColor(sf::Color color) { m_color = color; return *this; }
+        BlockCluster& setSize(float size) { m_size = size; return *this; }
+        BlockCluster& setShape(Shape shape) { m_shape = shape; return *this; }
+        
+        sf::Vector2f getPosition() { return m_position; }
+        sf::Color getColor() { return m_color; }
+        Shape getShape() { return m_shape; }
+        float getSize() { return m_size; }
+        
 
 };

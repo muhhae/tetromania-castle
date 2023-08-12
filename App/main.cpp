@@ -43,21 +43,38 @@ void input(BlockCluster& blockCluster, sf::Event event)
     blockCluster.move(move);
 }
 
+inline static std::vector<BlockCluster> blockClusters;
+
+BlockCluster & instantiate(BlockCluster::Shape shape = BlockCluster::Shape::rectangle, 
+                           sf::Vector2f position = sf::Vector2f(0, 0),
+                           sf::Color color = sf::Color::Red, 
+                           float size = 50)
+{
+    blockClusters.push_back(BlockCluster());
+    blockClusters.back().setPosition(position)
+                        .setColor(color)
+                        .setSize(size)
+                        .setShape(shape);
+    blockClusters.back().create();
+    
+    return blockClusters.back();
+}
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(600, 800), "SFML works!");
     sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));
     window.setView(view);
     
-    BlockCluster blockCluster;
-    blockCluster.create(BlockCluster::Shape::z_reverse,
-                        sf::Vector2f(-200, -200), 
-                        sf::Color::Green, 50);
-    
     sf::Clock clock;
     sf::Time dt;
     
     int shape = 0;
+    
+    BlockCluster & blockCluster = instantiate(BlockCluster::Shape::rectangle, 
+                                              sf::Vector2f(0, 0),
+                                              sf::Color::Red, 
+                                              50);
     
     while (window.isOpen())
     {
@@ -79,14 +96,23 @@ int main()
             {
                 if (event.key.code == sf::Keyboard::Space)
                 {
-                    blockCluster.create(static_cast<BlockCluster::Shape>(shape),
-                                        sf::Vector2f(-200, -200), 
-                                        sf::Color::Green, 50);
+                    blockCluster.setColor(sf::Color::Blue)
+                                .setShape(static_cast<BlockCluster::Shape>(shape));
+                    blockCluster.create();
                     shape++;
                     if (shape == static_cast<int>(BlockCluster::Shape::MAX))
                         shape = 0;
                 }
             }
+        }
+        
+        static float elapsedTime = 0;
+        elapsedTime += dt.asSeconds();
+        
+        if (elapsedTime >= 1 )
+        {
+            elapsedTime = 0;
+            blockCluster.move(sf::Vector2f(0, blockCluster.getSize()));
         }
         
         window.clear(sf::Color::Black);
