@@ -29,12 +29,17 @@ class BlockCluster : public sf::Drawable
     public:
         enum class Shape
         {
-            rectangle, line, l, l_reverse, t, z, z_reverse
+            rectangle, line, l, l_reverse, t, z, z_reverse, 
+            MAX
         };
         
     public:
-        void create(Shape shape, sf::Vector2f position, float size = 50);
+        void create(Shape shape = Shape::rectangle, 
+                    sf::Vector2f position = sf::Vector2f(0, 0),
+                    sf::Color color = sf::Color::Red, 
+                    float size = 50);
         void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+        void rotate();
         void move(sf::Vector2f offset)
         {
             for (auto & block : m_blocks)

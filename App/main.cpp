@@ -3,22 +3,6 @@
 
 #include "object/block.hpp"
 
-void input(Block & block, sf::Time dt)
-{
-    sf::Vector2f move;
-    
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        move.x -= 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        move.x += 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        move.y -= 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        move.y += 1;
-        
-    block.move(move * dt.asSeconds());
-}
-
 void input(Block & block, sf::Event event)
 {
     sf::Vector2f move;
@@ -51,7 +35,7 @@ void input(BlockCluster& blockCluster, sf::Event event)
         if (event.key.code == sf::Keyboard::Right)
             move.x += offset;
         if (event.key.code == sf::Keyboard::Up)
-            move.y -= offset;
+            blockCluster.rotate();
         if (event.key.code == sf::Keyboard::Down)
             move.y += offset;
     }
@@ -65,17 +49,15 @@ int main()
     sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));
     window.setView(view);
     
-    Block block;
-    
-    block.setColor(sf::Color::Red)
-         .setPosition(sf::Vector2f(100, 100))
-         .setSize(sf::Vector2f(50, 50));
-         
     BlockCluster blockCluster;
-    blockCluster.create(BlockCluster::Shape::z_reverse,sf::Vector2f(-200, -200));
+    blockCluster.create(BlockCluster::Shape::z_reverse,
+                        sf::Vector2f(-200, -200), 
+                        sf::Color::Green, 50);
     
     sf::Clock clock;
     sf::Time dt;
+    
+    int shape = 0;
     
     while (window.isOpen())
     {
@@ -84,7 +66,6 @@ int main()
         
         while (window.pollEvent(event))
         {
-            input(block, event);
             input(blockCluster, event);
             
             if (event.type == sf::Event::Closed)
@@ -94,12 +75,21 @@ int main()
                 view.setSize(event.size.width, event.size.height);
                 window.setView(view);
             }
+            if (event.type == sf::Event::KeyReleased)
+            {
+                if (event.key.code == sf::Keyboard::Space)
+                {
+                    blockCluster.create(static_cast<BlockCluster::Shape>(shape),
+                                        sf::Vector2f(-200, -200), 
+                                        sf::Color::Green, 50);
+                    shape++;
+                    if (shape == static_cast<int>(BlockCluster::Shape::MAX))
+                        shape = 0;
+                }
+            }
         }
         
-        // input(block, dt);
-        
         window.clear(sf::Color::Black);
-        // window.draw(block);
         window.draw(blockCluster);  
         window.display();
     }
