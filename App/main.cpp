@@ -22,7 +22,15 @@ int main()
     sf::Clock clock;
     sf::Time dt;
     
-    int shape = 0;
+    sf::Text scoreText;
+    sf::Font scoreFont;
+    
+    scoreFont.loadFromFile("ScoreFont.ttf");
+    
+    scoreText.setFont(scoreFont);
+    scoreText.setColor(sf::Color::White);
+    scoreText.setPosition(g_screen.left + 10, g_screen.top + 10);
+    scoreText.setCharacterSize(30);
     
     instantiate(randomShape(), 
                 randomPosition(), 
@@ -73,9 +81,12 @@ int main()
             }
         }
         
+        scoreText.setString(std::to_string(g_score));
+        
         window.clear(sf::Color::Black);
             for (const auto& blockCluster : blockClusters)
                 window.draw(blockCluster);
+            window.draw(scoreText);
         window.display();
     }
 

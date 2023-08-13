@@ -17,6 +17,8 @@ inline std::vector<BlockCluster> blockClusters;
 inline bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset);
 inline bool rotateBlockCluster(BlockCluster& blockCluster);
 
+inline int g_score = 0;
+
 void instantiate(BlockCluster::Shape shape = BlockCluster::Shape::rectangle, 
                  sf::Vector2f position = sf::Vector2f(0, 0),
                  sf::Color color = sf::Color::Red, 
@@ -186,6 +188,7 @@ void checkLine()
         }
     }
     
+    int line_count = 0;
     for (auto & line : lines)
     {
         std::cout << "line : " << line.first << std::endl;
@@ -193,6 +196,8 @@ void checkLine()
          
         if (line.second.size() >= maxLine)
         {
+            line_count++;
+            g_score += 1000;
             for (auto & blockInfo : line.second)
             {
                 blockClusters[blockInfo.blockClusterIndex].getBlocks().at(blockInfo.blockIndex) = Block();
@@ -201,7 +206,26 @@ void checkLine()
             }
         }
     }
-    for (int i = 0; i < g_screen.height/50; i++)
+    
+    for (int i = 0; i < line_count; i++)
         for (auto& blockCluster : blockClusters)
             moveBlockCluster(blockCluster, sf::Vector2f(0, blockCluster.getSize()));
+}
+
+bool checkLose()
+{
+    for (auto& blockCluster : blockClusters)
+    {
+        if (&blockCluster != &blockClusters.back()) continue;
+        for (auto& block : blockCluster.getBlocks())
+        {
+            if (!block.getActive()) continue;
+            if (block.getPosition().y < g_screen.top)
+            {
+                std::cout << "Lose" << std::endl;
+                return true;
+            }
+        }
+    }
+    return false;
 }
