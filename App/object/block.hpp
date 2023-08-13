@@ -5,7 +5,8 @@
 class Block : public sf::Drawable
 {
     private:
-        sf::RectangleShape m_shape = sf::RectangleShape(sf::Vector2f(50, 50));
+        sf::RectangleShape m_shape;
+        bool m_active = true;
     public:
         Block() {} ;
         
@@ -20,6 +21,9 @@ class Block : public sf::Drawable
         sf::Vector2f getPosition() { return m_shape.getPosition(); }
         sf::Color getColor() { return m_shape.getFillColor(); }
         sf::Vector2f getSize() { return m_shape.getSize(); }
+        
+        void setActive(bool active = true) { m_active = active; }
+        bool getActive() { return m_active; }
 };
 
 class BlockCluster : public sf::Drawable
@@ -56,6 +60,9 @@ class BlockCluster : public sf::Drawable
         sf::Color getColor() { return m_color; }
         Shape getShape() { return m_shape; }
         float getSize() { return m_size; }
+        
+        sf::Vector2f getBottomPosition();
+        std::vector<Block>& getBlocks() { return m_blocks; }
         
 
 };

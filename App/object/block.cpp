@@ -97,3 +97,14 @@ void BlockCluster::draw(sf::RenderTarget & target, sf::RenderStates states) cons
     for (auto & block : m_blocks)
         target.draw(block);
 }
+
+sf::Vector2f BlockCluster::getBottomPosition()
+{
+    sf::Vector2f bottom = m_blocks[0].getPosition();
+    for (auto& block : m_blocks)
+    {
+        if (block.getPosition().y > bottom.y)
+            bottom = block.getPosition();
+    }
+    return bottom + sf::Vector2f(0, getSize());
+}
