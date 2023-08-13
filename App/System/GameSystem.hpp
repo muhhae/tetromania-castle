@@ -1,9 +1,11 @@
+#pragma once
+
 #include <vector>
 #include <array>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "object/block.hpp"
+#include "Object/block.hpp"
 
 struct gameScreen 
 {
@@ -216,11 +218,11 @@ bool checkLose()
 {
     for (auto& blockCluster : blockClusters)
     {
-        if (&blockCluster != &blockClusters.back()) continue;
+        if (&blockCluster == &blockClusters.back()) break;
         for (auto& block : blockCluster.getBlocks())
         {
             if (!block.getActive()) continue;
-            if (block.getPosition().y < g_screen.top)
+            if (block.getPosition().y <= g_screen.top)
             {
                 std::cout << "Lose" << std::endl;
                 return true;
