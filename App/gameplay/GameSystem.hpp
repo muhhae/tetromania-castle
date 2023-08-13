@@ -1,4 +1,5 @@
 #include <vector>
+#include <array>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -72,11 +73,11 @@ bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
     {
         if (!block.getActive()) continue;
         if (block.getPosition().x + offset.x < g_screen.left ||
-            block.getPosition().x + offset.x > g_screen.right ||
+            block.getPosition().x + offset.x >= g_screen.right ||
             block.getPosition().y + offset.y >= g_screen.bottom)
         {
-            std::cout << "Pos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-            std::cout << "Out of bound" <<std::endl;
+            // std::cout << "Pos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+            // std::cout << "Out of bound" <<std::endl;
             return false;
         }
     }
@@ -93,7 +94,7 @@ bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
                 if (!b.getActive()) continue;
                 if (block.getPosition() + offset == b.getPosition())
                 {
-                    std::cout << "Collide" <<std::endl;
+                    // std::cout << "Collide" <<std::endl;
                     return false;
                 }
             }
@@ -113,11 +114,11 @@ bool rotateBlockCluster(BlockCluster& blockCluster)
         if (!block.getActive()) continue;
         
         if (block.getPosition().x < g_screen.left ||
-            block.getPosition().x > g_screen.right ||
+            block.getPosition().x >= g_screen.right ||
             block.getPosition().y >= g_screen.bottom)
         {
-            std::cout << "Out of bound" <<std::endl;
-            std::cout << "failRotate" <<std::endl;
+            // std::cout << "Out of bound" <<std::endl;
+            // std::cout << "failRotate" <<std::endl;
             return false;
         }
     }
@@ -152,18 +153,19 @@ BlockCluster::Shape randomShape()
 
 sf::Color randomColor()
 {
-    return sf::Color(rand() % 255, rand() % 255, rand() % 255);
+    std::array<sf::Color, 4> colors = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow};
+    return colors[rand() % colors.size()];
 }
 
 sf::Vector2f randomPosition()
 {
     int tile = (g_screen.width - 300) / 50;
-    return sf::Vector2f((rand() % tile) * 50 - g_screen.right, g_screen.top);
+    return sf::Vector2f((rand() % tile) * 50 - g_screen.right + 150, g_screen.top);
 }
 
 void checkLine()
 {
-    const int maxLine = 13;
+    const int maxLine = 12;
     struct blockInfo
     {
         int blockClusterIndex;
@@ -178,12 +180,17 @@ void checkLine()
         for (int j = 0; j < blocks.size(); j++)
         {
             auto & block = blocks[j];
+            if (!block.getActive()) continue;
+            
             lines[block.getPosition().y].push_back({i, j});
         }
     }
     
     for (auto & line : lines)
     {
+        std::cout << "line : " << line.first << std::endl;
+        std::cout << "size : " << line.second.size() << std::endl;
+         
         if (line.second.size() >= maxLine)
         {
             for (auto & blockInfo : line.second)
@@ -194,6 +201,7 @@ void checkLine()
             }
         }
     }
-    for (auto& blockCluster : blockClusters)
-        moveBlockCluster(blockCluster, sf::Vector2f(0, blockCluster.getSize()));
+    for (int i = 0; i < g_screen.height/50; i++)
+        for (auto& blockCluster : blockClusters)
+            moveBlockCluster(blockCluster, sf::Vector2f(0, blockCluster.getSize()));
 }

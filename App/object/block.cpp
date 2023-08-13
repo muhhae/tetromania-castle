@@ -26,8 +26,6 @@ void BlockCluster::create()
     case Shape::line:
         for (int i = 0; i < 4; i++)
         {
-            m_blocks.push_back(block);
-            
             sf::Vector2f offset = sf::Vector2f(0, 0);
             offset.x += block.getSize().x * i;
             
