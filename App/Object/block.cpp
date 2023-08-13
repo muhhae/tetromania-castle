@@ -1,4 +1,4 @@
-#include "block.hpp"
+#include "Block.hpp"
 
 void Block::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {   
@@ -12,8 +12,12 @@ void BlockCluster::create()
     
     if (m_shape == Shape::z_reverse) m_position.x += m_size;
     
+    static sf::Texture g_blockTexture;
+    g_blockTexture.loadFromFile("block_1.png");
+    
     block.setSize(sf::Vector2f(m_size, m_size))
          .setColor(m_color)
+         .setTexture(&g_blockTexture)
          .setPosition(m_position);
          
     for (int i = 0; i < 4; i++)

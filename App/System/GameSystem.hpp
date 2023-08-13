@@ -5,7 +5,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "Object/block.hpp"
+#include "Object/Block.hpp"
 
 struct gameScreen 
 {
@@ -157,7 +157,8 @@ BlockCluster::Shape randomShape()
 
 sf::Color randomColor()
 {
-    std::array<sf::Color, 4> colors = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow};
+    std::array<sf::Color, 4> colors = {sf::Color::Red, sf::Color::Blue, sf::Color::Green, sf::Color::Yellow};
+    
     return colors[rand() % colors.size()];
 }
 

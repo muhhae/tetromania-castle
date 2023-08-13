@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "Object/block.hpp"
+#include "Object/Block.hpp"
 #include "System/GameSystem.hpp"
 
 int main()
@@ -31,6 +31,8 @@ int main()
     scoreText.setColor(sf::Color::White);
     scoreText.setPosition(g_screen.left + 10, g_screen.top + 10);
     scoreText.setCharacterSize(30);
+    
+    // loadBlockTexture("block.png");
     
     instantiate(randomShape(), 
                 randomPosition(), 

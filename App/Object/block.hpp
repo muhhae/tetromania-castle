@@ -15,6 +15,7 @@ class Block : public sf::Drawable
         Block& setPosition(sf::Vector2f position) { m_shape.setPosition(position) ; return *this; }
         Block& setColor(sf::Color color) { m_shape.setFillColor(color); return *this; }
         Block& setSize(sf::Vector2f size) { m_shape.setSize(size); return *this; }
+        Block& setTexture(const sf::Texture * texture) { m_shape.setTexture(texture); return *this; }
         
         void move(sf::Vector2f offset) { m_shape.move(offset); }
         
@@ -63,6 +64,4 @@ class BlockCluster : public sf::Drawable
         
         sf::Vector2f getBottomPosition();
         std::vector<Block>& getBlocks() { return m_blocks; }
-        
-
 };
