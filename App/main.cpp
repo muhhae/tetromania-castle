@@ -3,6 +3,7 @@
 
 #include "Object/Block.hpp"
 #include "System/GameSystem.hpp"
+#include "System/Randomizer.hpp"
 
 int main()
 {
@@ -24,6 +25,12 @@ int main()
     
     sf::Text scoreText;
     sf::Font firaFont;
+    
+    sf::Texture backgroundTexture;
+    backgroundTexture.loadFromFile("castle_1.jpg");
+    sf::Sprite background(backgroundTexture);
+    background.setPosition(g_screen.left, g_screen.top);
+    background.scale(0.8, 0.8);
     
     firaFont.loadFromFile("firaFont.ttf");
     
@@ -90,6 +97,7 @@ int main()
             scoreText.setString(std::to_string(g_score));
             
             window.clear(sf::Color::Black);
+                window.draw(background);
                 for (const auto& blockCluster : blockClusters)
                     window.draw(blockCluster);
                 window.draw(scoreText);

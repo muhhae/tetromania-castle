@@ -13,7 +13,7 @@ void BlockCluster::create()
     if (m_shape == Shape::z_reverse) m_position.x += m_size;
     
     static sf::Texture g_blockTexture;
-    g_blockTexture.loadFromFile("block_2.png");
+    g_blockTexture.loadFromFile("brick_2.jpg");
     
     block.setSize(sf::Vector2f(m_size, m_size))
          .setColor(m_color)
@@ -100,13 +100,3 @@ void BlockCluster::draw(sf::RenderTarget & target, sf::RenderStates states) cons
         target.draw(block);
 }
 
-sf::Vector2f BlockCluster::getBottomPosition()
-{
-    sf::Vector2f bottom = m_blocks[0].getPosition();
-    for (auto& block : m_blocks)
-    {
-        if (block.getPosition().y > bottom.y)
-            bottom = block.getPosition();
-    }
-    return bottom + sf::Vector2f(0, getSize());
-}
