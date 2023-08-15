@@ -1,11 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <array>
-#include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include <vector>
+#include <deque>
+#include <array>
+#include <iostream>
+#include <unordered_map>
+#include <functional>
+
 #include "Object/Block.hpp"
+#include "GeneralFunction.hpp"
 
 struct gameScreen 
 {
@@ -20,6 +25,16 @@ inline bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset);
 inline bool rotateBlockCluster(BlockCluster& blockCluster);
 
 inline int g_score = 0;
+
+void initGameScreen(int width, int height)
+{
+    g_screen.width = width;
+    g_screen.height = height;
+    g_screen.top = -height / 2;
+    g_screen.bottom = height / 2;
+    g_screen.left = -width / 2;
+    g_screen.right = width / 2;
+}
 
 void instantiate(BlockCluster::Shape shape = BlockCluster::Shape::rectangle, 
                  sf::Vector2f position = sf::Vector2f(0, 0),
@@ -75,13 +90,12 @@ bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
 {
     for (auto& block : blockCluster.getBlocks())
     {
-        if (!block.getActive()) continue;
         if (block.getPosition().x + offset.x < g_screen.left ||
             block.getPosition().x + offset.x >= g_screen.right ||
             block.getPosition().y + offset.y >= g_screen.bottom)
         {
-            // std::cout << "Pos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-            // std::cout << "Out of bound" <<std::endl;
+            std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+            std::cout << "Out of bound" <<std::endl;
             return false;
         }
     }
@@ -92,13 +106,12 @@ bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
         
         for (auto& block : blockCluster.getBlocks())
         {
-            if (!block.getActive()) continue;
             for (auto& b : bc.getBlocks())
             {   
-                if (!b.getActive()) continue;
                 if (block.getPosition() + offset == b.getPosition())
                 {
-                    // std::cout << "Collide" <<std::endl;
+                    std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+                    std::cout << "Collide" <<std::endl;
                     return false;
                 }
             }
@@ -140,7 +153,8 @@ bool rotateBlockCluster(BlockCluster& blockCluster)
                 if (!b.getActive()) continue;
                 if (block.getPosition() == b.getPosition())
                 {
-                    std::cout << "Collide" <<std::endl;
+                    std::cout << "Pos : " << block.getPosition().x << ", " << block.getPosition().y << std::endl;
+                    std::cout << "Collide\n" <<std::endl;
                     return false;
                 }
             }
@@ -149,9 +163,37 @@ bool rotateBlockCluster(BlockCluster& blockCluster)
     blockCluster.rotate();
 }
 
+bool moveBlock(Block & block, sf::Vector2f offset)
+{
+    if (block.getPosition().x + offset.x < g_screen.left ||
+        block.getPosition().x + offset.x >= g_screen.right ||
+        block.getPosition().y + offset.y >= g_screen.bottom)
+    {
+        std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+        std::cout << "Out of bound" <<std::endl;
+        return false;
+    }
+    
+    for (auto & blockCluster : blockClusters)
+    {
+        for (auto & b : blockCluster.getBlocks())
+        {
+            if (block.getPosition() + offset == b.getPosition())
+            {
+                std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+                std::cout << "Collide" <<std::endl;
+                return false;
+            }
+        }
+    }
+    
+    block.move(offset);
+    return true;
+}
+
 BlockCluster::Shape randomShape()
 {
-    // return BlockCluster::Shape::rectangle;
+    return BlockCluster::Shape::t;
     return static_cast<BlockCluster::Shape>(rand() % static_cast<int>(BlockCluster::Shape::MAX));
 }
 
@@ -168,51 +210,72 @@ sf::Vector2f randomPosition()
     return sf::Vector2f((rand() % tile) * 50 - g_screen.right + 150, g_screen.top);
 }
 
-void checkLine()
+void betterCheckLine()
 {
     const int maxLine = 12;
-    struct blockInfo
+    
+    struct lineInfo
     {
-        int blockClusterIndex;
-        int blockIndex;
+        lineInfo(float y, int count) : y(y), count(count) {}
+        float y;
+        int count = 0;
     };
     
-    std::map<int, std::vector<blockInfo>> lines;
+    std::vector<lineInfo> lines;
     
-    for (int i = 0; i < blockClusters.size(); i++)
+    for (auto& bc : blockClusters)
     {
-        auto & blocks = blockClusters[i].getBlocks();
-        for (int j = 0; j < blocks.size(); j++)
+        auto& blocks = bc.getBlocks();
+        for (auto& block : blocks)
         {
-            auto & block = blocks[j];
-            if (!block.getActive()) continue;
+            auto iter = std::find_if(lines.begin(), lines.end(), [&](lineInfo& line){return line.y == block.getPosition().y;});
+            if (iter != lines.end())
+            {
+                iter->count++;
+            }
+            else
+            {
+                lines.push_back(lineInfo(block.getPosition().y, 1));
+            }
             
-            lines[block.getPosition().y].push_back({i, j});
         }
     }
     
-    int line_count = 0;
-    for (auto & line : lines)
+    int lineCount = 0;
+    
+    for (auto& line : lines)
     {
-        std::cout << "line : " << line.first << std::endl;
-        std::cout << "size : " << line.second.size() << std::endl;
-         
-        if (line.second.size() >= maxLine)
+        if (line.count >= maxLine)
         {
-            line_count++;
+            lineCount++;
             g_score += 1000;
-            for (auto & blockInfo : line.second)
+            for (auto & blockCluster : blockClusters)
             {
-                blockClusters[blockInfo.blockClusterIndex].getBlocks().at(blockInfo.blockIndex) = Block();
-                blockClusters[blockInfo.blockClusterIndex].getBlocks().at(blockInfo.blockIndex)
-                                                                      .setActive(false);
+                auto & blocks = blockCluster.getBlocks();
+                
+                deleteAll<Block>(blocks, [&](Block& block){return block.getPosition().y == line.y;});
+            }  
+        }
+    }
+    
+    if (lineCount <= 0) return;
+    
+    deleteAll<BlockCluster>(blockClusters, [&](BlockCluster& blockCluster){return blockCluster.getBlocks().empty();});
+    
+    for (int i = 0; i < lineCount; i++)
+    {
+        std::cout << "\nMoving down\n";
+        for (auto& blockCluster : blockClusters)
+        {
+            for (auto& block : blockCluster.getBlocks())
+            {
+                if (!moveBlock(block, sf::Vector2f(0, block.getSize().y)))
+                {
+                    std::cout << "fail\n";
+                }
             }
         }
     }
-    
-    for (int i = 0; i < line_count; i++)
-        for (auto& blockCluster : blockClusters)
-            moveBlockCluster(blockCluster, sf::Vector2f(0, blockCluster.getSize()));
 }
 
 bool checkLose()
@@ -222,7 +285,6 @@ bool checkLose()
         if (&blockCluster == &blockClusters.back()) break;
         for (auto& block : blockCluster.getBlocks())
         {
-            if (!block.getActive()) continue;
             if (block.getPosition().y <= g_screen.top)
             {
                 std::cout << "Lose" << std::endl;

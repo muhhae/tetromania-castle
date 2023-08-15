@@ -79,7 +79,7 @@ int main()
                 elapsedTime = 0;
                 if (!moveBlockCluster(blockClusters.back(), sf::Vector2f(0, blockClusters.back().getSize())))
                 {
-                    checkLine();
+                    betterCheckLine();
                     instantiate(randomShape(), 
                                 randomPosition(), 
                                 randomColor(), 

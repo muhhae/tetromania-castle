@@ -64,4 +64,6 @@ class BlockCluster : public sf::Drawable
         
         sf::Vector2f getBottomPosition();
         std::vector<Block>& getBlocks() { return m_blocks; }
+        
+        bool operator==(const BlockCluster& other) { return this == &other; }
 };
