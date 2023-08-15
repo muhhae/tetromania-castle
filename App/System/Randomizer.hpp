@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GameSystem.hpp"
+#include "Object/Block.hpp"
+#include "Global.hpp"
 
 BlockCluster::Shape randomShape()
 {
