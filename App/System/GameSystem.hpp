@@ -22,7 +22,8 @@ public : //public function
     // @param none
     // @return none
     void run();
-    void init();
+    void init(sf::RenderWindow & window);
+    void restart();
 private : //private function
     // @brief Instantiate a block cluster
     // @param shape of the block cluster
@@ -66,8 +67,8 @@ private : //private struct
 private : //private variable
     std::vector<BlockCluster> blockClusters;
     int g_score = 0;
+    bool lose = false;
     
-    sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "SFML works!", sf::Style::Close);
     sf::View view;
         
 };

@@ -16,7 +16,7 @@ public:
     Button& setButtonColor(sf::Color color) {m_button.setFillColor(color); return *this;}
     Button& setButtonOutlineColor(sf::Color color) {m_button.setOutlineColor(color); return *this;}
     Button& setButtonOutlineThickness(float thickness) {m_button.setOutlineThickness(thickness); return *this;}
-    Button& setButtonTexture(sf::Texture* texture) {m_button.setTexture(texture); return *this;}
+    Button& setButtonTexture(sf::Texture& texture) {m_button.setTexture(&texture); return *this;}
     
     Button& setFont(sf::Font font) {m_font = font; return *this;}
     Button& setTextCenter()
@@ -33,9 +33,11 @@ public:
     
     Button& setButtonOnClick(std::function<void()> functionOnClick) {m_onClick = functionOnClick; return *this;}
     Button& setButtonOnHover(std::function<void()> functionOnHover) {m_onHover = functionOnHover; return *this;}
+    Button& setButtonOnUpdate(std::function<void()> functionOnUpdate) {m_onUpdate = functionOnUpdate; return *this;}
     
     void update(const sf::RenderWindow & window)
     {
+        if (m_onUpdate) m_onUpdate();
         sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         if (m_button.getGlobalBounds().contains(mousePosition) && m_onHover)
         {
@@ -70,6 +72,8 @@ private:
     
     std::function<void()> m_onClick;
     std::function<void()> m_onHover;
+    std::function<void()> m_onRelease;
+    std::function<void()> m_onUpdate;
     
     static bool isMouseDown;
 };

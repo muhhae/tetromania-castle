@@ -3,39 +3,61 @@
 
 void Game::run()
 {
-    init();
+    std::cout << "Game is starting" << std::endl;
+    
+    sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetris", sf::Style::Close);
+    init(window);
+    
+    g_font.loadFromFile(firaFontPath);
+    
+    std::cout << "Game is running" << std::endl;
         
     sf::Clock clock;
     sf::Time dt;
     sf::Time dt_fixed;
     float TimeScale = 1;
     
-    sf::Text scoreText;
+    int fps = 0;
     
-    sf::Texture backgroundTexture;
-    backgroundTexture.loadFromFile(g_selectedBackground);
-    sf::Sprite background(backgroundTexture);
+    sf::Text scoreText;
+    sf::Sprite background(getTexture(castleBackgroundPath));
     background.setPosition(g_screen.left - 500, g_screen.top);
     background.scale(2, 2);
-    // background.setColor(sf::Color(128, 128, 128, 255));
-    
-    sf::Texture pauseTexture;
-    pauseTexture.loadFromFile(g_buttonPath + "Pause.png");
-    pauseTexture.setSmooth(true);
     
     scoreText.setFont(g_font);
     scoreText.setColor(sf::Color::White);
     scoreText.setPosition(g_screen.left + 10, g_screen.top + 10);
-    scoreText.setCharacterSize(30);
+    scoreText.setCharacterSize(50);
     
-    // loadBlockTexture("block.png");
+    sf::Text fpsText;
+    fpsText.setFont(g_font);
+    fpsText.setColor(sf::Color::White);
+    fpsText.setPosition(g_screen.left + 10, g_screen.top + 60);
+    fpsText.setCharacterSize(20);
     
-    instantiate(randomShape(), 
-                randomPosition(), 
-                randomColor(), 
-                50);
+    restart();
     
-    bool lose = false;
+    Button pauseButton;
+    pauseButton.setButtonTexture(getTexture(pauseButtonTexturePath))
+                .setButtonPosition(sf::Vector2f(g_screen.right - 50, g_screen.top + 50))
+                .setButtonSize(sf::Vector2f(75, 75))
+                .setTextString("")
+                .setOrigin(sf::Vector2f(37, 37))
+                .setButtonOnUpdate([&]()
+                {
+                    pauseButton.setButtonColor(sf::Color(255, 255, 255, 255));
+                })
+                .setButtonOnHover([&]()
+                {
+                    pauseButton.setButtonColor(sf::Color(128, 128, 128, 255));
+                })
+                .setButtonOnClick([&]()
+                {
+                    if (TimeScale == 1)
+                        TimeScale = 0;
+                    else
+                        TimeScale = 1;
+                });
     
     while (window.isOpen())
     {
@@ -47,7 +69,8 @@ void Game::run()
             
             while (window.pollEvent(event))
             {
-                if (TimeScale) input(blockClusters.back(), event);
+                bool inputResult = false;
+                if (TimeScale) inputResult = input(blockClusters.back(), event);
                 
                 if (event.type == sf::Event::Closed)
                     window.close();
@@ -80,6 +103,7 @@ void Game::run()
             
             if (elapsedTime >= 1)
             {
+                fps = 1 / dt.asSeconds();
                 elapsedTime = 0;
                 if (!moveBlockCluster(blockClusters.back(), sf::Vector2f(0, blockClusters.back().getSize())))
                 {
@@ -91,32 +115,15 @@ void Game::run()
                 }
             }
             
+            fpsText.setString("FPS: " + std::to_string(fps));
             scoreText.setString(std::to_string(g_score));
             
-            Button pauseButton;
-            pauseButton.setButtonTexture(&pauseTexture)
-                       .setButtonPosition(sf::Vector2f(g_screen.right - 50, g_screen.top + 50))
-                       .setButtonSize(sf::Vector2f(75, 75))
-                       .setTextString("")
-                       .setOrigin(sf::Vector2f(37, 37));
-            
-            pauseButton.setButtonOnHover([&]()
-            {
-                pauseButton.setButtonColor(sf::Color(128, 128, 128, 255));
-            });
-            pauseButton.setButtonOnClick([&]()
-            {
-                if (TimeScale == 1)
-                    TimeScale = 0;
-                else
-                    TimeScale = 1;
-            }).update(window);
+            pauseButton.update(window);
             
             window.clear(sf::Color::Black);
                 window.draw(background);
                 for (const auto& blockCluster : blockClusters)
                     window.draw(blockCluster);
-                window.draw(scoreText);
                 
                 if (TimeScale == 0)
                 {
@@ -133,6 +140,8 @@ void Game::run()
                     window.draw(pauseText);
                 }
                 window.draw(pauseButton);
+                window.draw(fpsText);
+                window.draw(scoreText);
             window.display();
             lose = checkLose();
         }
@@ -143,19 +152,6 @@ void Game::run()
             {
                 if (event.type == sf::Event::Closed)
                     window.close();
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    if (event.key.code == sf::Keyboard::Space)
-                    {
-                        lose = false;
-                        g_score = 0;
-                        blockClusters.clear();
-                        instantiate(randomShape(), 
-                                    randomPosition(), 
-                                    randomColor(), 
-                                    50);
-                    }
-                }
             }
             sf::Text loseText;
             loseText.setFont(g_font);
@@ -173,23 +169,13 @@ void Game::run()
             scoreText.setOrigin(scoreText.getLocalBounds().width / 2, scoreText.getLocalBounds().height / 2);
             scoreText.setPosition(0, 50);
             
-            sf::Text tryAgain;
-            tryAgain.setFont(g_font);
-            tryAgain.setColor(sf::Color::White);
-            tryAgain.setCharacterSize(30);
-            tryAgain.setString("Press space to try again");
-            tryAgain.setOrigin(tryAgain.getLocalBounds().width / 2, tryAgain.getLocalBounds().height / 2);
-            tryAgain.setPosition(0, 100);
-            
             Button button;
             button.setButtonPosition(sf::Vector2f(0, 200))
-                  .setOrigin(sf::Vector2f(100, 25))
-                  .setButtonSize(sf::Vector2f(200, 50))
-                  .setButtonOutlineThickness(5)
-                  .setButtonOutlineColor(sf::Color::Green)
-                  .setButtonColor(sf::Color::Red)
+                  .setOrigin(sf::Vector2f(115, 40))
+                  .setButtonSize(sf::Vector2f(230, 80))
+                  .setButtonTexture(getTexture(buttonTexturePath))
                   
-                  .setTextPosition(sf::Vector2f(0, 200))
+                  .setTextPosition(sf::Vector2f(0, 195))
                   .setTextString("TRY AGAIN")
                   .setTextSize(30)
                   .setTextCenter()
@@ -197,13 +183,12 @@ void Game::run()
                   
                   .setButtonOnHover([&]()
                     {
-                        button.setButtonOutlineColor(sf::Color::Red);
-                        button.setButtonColor(sf::Color::Green);
-                        button.setTextColor(sf::Color::Red);
+                        button.setTextPosition(sf::Vector2f(0, 200));
+                        button.setButtonTexture(getTexture(buttonOnHoverTexturePath));
                     })
                   .setButtonOnClick([&]()
                     {
-                        g_score += 1000;
+                        restart();
                     })
                   .update(window);
             
@@ -211,13 +196,12 @@ void Game::run()
                 window.draw(background);
                 window.draw(loseText);
                 window.draw(scoreText);
-                window.draw(tryAgain);
                 window.draw(button);
             window.display();
         }
     }
 }
-void Game::init()
+void Game::init(sf::RenderWindow& window)
 {
     srand(time(NULL));
     
@@ -231,8 +215,16 @@ void Game::init()
     
     g_screen.width = view.getSize().x;
     g_screen.height = view.getSize().y;
-    
-    g_font.loadFromFile(g_selectedFont);
+}
+void Game::restart()
+{
+    lose = false;
+    g_score = 0;
+    blockClusters.clear();
+    instantiate(randomShape(), 
+                randomPosition(), 
+                randomColor(), 
+                50);
 }
 void Game::instantiate(BlockCluster::Shape shape, 
                        sf::Vector2f position,
@@ -323,7 +315,7 @@ bool Game::input(BlockCluster& blockCluster, sf::Event event)
     sf::Vector2f move;
     float offset = blockCluster.getSize();
     
-    if (event.type == sf::Event::KeyReleased)
+    if (event.type == sf::Event::KeyPressed)
     {
         if (event.key.code == sf::Keyboard::Left)
             move.x -= offset;
@@ -333,7 +325,7 @@ bool Game::input(BlockCluster& blockCluster, sf::Event event)
             rotateBlockCluster(blockCluster);
         if (event.key.code == sf::Keyboard::Down)
             move.y += offset;
-    }
+    } else return false;
     return moveBlockCluster(blockCluster, move);
 }
 bool Game::moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
@@ -344,8 +336,8 @@ bool Game::moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
             block.getPosition().x + offset.x >= g_screen.right ||
             block.getPosition().y + offset.y >= g_screen.bottom)
         {
-            std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-            std::cout << "Out of bound" <<std::endl;
+            // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+            // std::cout << "Out of bound" <<std::endl;
             return false;
         }
     }
@@ -360,8 +352,8 @@ bool Game::moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset)
             {   
                 if (block.getPosition() + offset == b.getPosition())
                 {
-                    std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-                    std::cout << "Collide" <<std::endl;
+                    // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+                    // std::cout << "Collide" <<std::endl;
                     return false;
                 }
             }
@@ -402,8 +394,8 @@ bool Game::rotateBlockCluster(BlockCluster& blockCluster)
                 if (!b.getActive()) continue;
                 if (block.getPosition() == b.getPosition())
                 {
-                    std::cout << "Pos : " << block.getPosition().x << ", " << block.getPosition().y << std::endl;
-                    std::cout << "Collide\n" <<std::endl;
+                    // std::cout << "Pos : " << block.getPosition().x << ", " << block.getPosition().y << std::endl;
+                    // std::cout << "Collide\n" <<std::endl;
                     return false;
                 }
             }
@@ -417,8 +409,8 @@ bool Game::moveBlock(Block & block, sf::Vector2f offset)
         block.getPosition().x + offset.x >= g_screen.right ||
         block.getPosition().y + offset.y >= g_screen.bottom)
     {
-        std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-        std::cout << "Out of bound" <<std::endl;
+        // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+        // std::cout << "Out of bound" <<std::endl;
         return false;
     }
     
@@ -428,8 +420,8 @@ bool Game::moveBlock(Block & block, sf::Vector2f offset)
         {
             if (block.getPosition() + offset == b.getPosition())
             {
-                std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-                std::cout << "Collide" <<std::endl;
+                // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
+                // std::cout << "Collide" <<std::endl;
                 return false;
             }
         }
@@ -447,7 +439,7 @@ bool Game::checkLose()
         {
             if (block.getPosition().y <= g_screen.top)
             {
-                std::cout << "Lose" << std::endl;
+                // std::cout << "Lose" << std::endl;
                 return true;
             }
         }
