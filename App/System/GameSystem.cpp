@@ -140,8 +140,12 @@ void Game::run()
                   .setButtonOnHover([&]()
                                     {
                                         button.setButtonColor(sf::Color::Green);
+                                    })
+                  .setButtonOnClick([&]()
+                                    {
+                                        g_score += 1000;
                                     });
-            
+                  
             button.update(window);
             
             window.clear(sf::Color::Black);

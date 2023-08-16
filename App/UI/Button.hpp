@@ -29,9 +29,25 @@ public:
     void update(const sf::RenderWindow & window)
     {
         sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        if (m_button.getGlobalBounds().contains(mousePosition))
+        if (m_button.getGlobalBounds().contains(mousePosition) && m_onHover)
         {
             m_onHover();
+        }
+        
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            isMouseDown = false;
+        }
+        
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) 
+            && m_button.getGlobalBounds().contains(mousePosition)
+            && m_onClick)
+        {
+            if (!isMouseDown)
+            {
+                m_onClick();
+                isMouseDown = true;
+            }
         }
     }
     void draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -46,4 +62,9 @@ private:
     
     std::function<void()> m_onClick;
     std::function<void()> m_onHover;
+    
+    static bool isMouseDown;
 };
+
+bool Button::isMouseDown = false;
+
