@@ -13,7 +13,7 @@ void BlockCluster::create()
     if (m_shape == Shape::z_reverse) m_position.x += m_size;
     
     static sf::Texture g_blockTexture;
-    g_blockTexture.loadFromFile("brick_2.jpg");
+    g_blockTexture.loadFromFile("Resource/BLock/block_2.png");
     
     block.setSize(sf::Vector2f(m_size, m_size))
          .setColor(m_color)

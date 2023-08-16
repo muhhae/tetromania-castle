@@ -1,9 +1,4 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-
-#include "Object/Block.hpp"
 #include "System/GameSystem.hpp"
-#include "System/Randomizer.hpp"
 
 int main()
 {
