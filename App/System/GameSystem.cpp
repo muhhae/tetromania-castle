@@ -7,6 +7,8 @@ void Game::run()
         
     sf::Clock clock;
     sf::Time dt;
+    sf::Time dt_fixed;
+    float TimeScale = 1;
     
     sf::Text scoreText;
     
@@ -16,6 +18,10 @@ void Game::run()
     background.setPosition(g_screen.left - 500, g_screen.top);
     background.scale(2, 2);
     // background.setColor(sf::Color(128, 128, 128, 255));
+    
+    sf::Texture pauseTexture;
+    pauseTexture.loadFromFile(g_buttonPath + "Pause.png");
+    pauseTexture.setSmooth(true);
     
     scoreText.setFont(g_font);
     scoreText.setColor(sf::Color::White);
@@ -33,14 +39,15 @@ void Game::run()
     
     while (window.isOpen())
     {
-        dt = clock.restart();
+        dt_fixed = clock.restart();
+        dt = dt_fixed * TimeScale;
         if (!lose)
         {
             sf::Event event;
             
             while (window.pollEvent(event))
             {
-                input(blockClusters.back(), event);
+                if (TimeScale) input(blockClusters.back(), event);
                 
                 if (event.type == sf::Event::Closed)
                     window.close();
@@ -51,6 +58,13 @@ void Game::run()
                 }
                 if (event.type == sf::Event::KeyReleased)
                 {
+                    if (event.key.code == sf::Keyboard::Escape)
+                    {
+                        if (TimeScale == 1)
+                            TimeScale = 0;
+                        else
+                            TimeScale = 1;
+                    }
                     if (event.key.code == sf::Keyboard::X)
                     {
                         instantiate(randomShape(), 
@@ -79,11 +93,46 @@ void Game::run()
             
             scoreText.setString(std::to_string(g_score));
             
+            Button pauseButton;
+            pauseButton.setButtonTexture(&pauseTexture)
+                       .setButtonPosition(sf::Vector2f(g_screen.right - 50, g_screen.top + 50))
+                       .setButtonSize(sf::Vector2f(75, 75))
+                       .setTextString("")
+                       .setOrigin(sf::Vector2f(37, 37));
+            
+            pauseButton.setButtonOnHover([&]()
+            {
+                pauseButton.setButtonColor(sf::Color(128, 128, 128, 255));
+            });
+            pauseButton.setButtonOnClick([&]()
+            {
+                if (TimeScale == 1)
+                    TimeScale = 0;
+                else
+                    TimeScale = 1;
+            }).update(window);
+            
             window.clear(sf::Color::Black);
                 window.draw(background);
                 for (const auto& blockCluster : blockClusters)
                     window.draw(blockCluster);
                 window.draw(scoreText);
+                
+                if (TimeScale == 0)
+                {
+                    sf::RectangleShape pauseBackground(sf::Vector2f(g_screen.width, g_screen.height));
+                    pauseBackground.setFillColor(sf::Color(0, 0, 0, 128));
+                    pauseBackground.setOrigin(pauseBackground.getLocalBounds().width / 2, pauseBackground.getLocalBounds().height / 2);
+                    pauseBackground.setPosition(0, 0);
+                    window.draw(pauseBackground);
+                    
+                    sf::Text pauseText = sf::Text("PAUSE", g_font, 50);
+                    pauseText.setColor(sf::Color::White);
+                    pauseText.setOrigin(pauseText.getLocalBounds().width / 2, pauseText.getLocalBounds().height / 2);
+                    pauseText.setPosition(0, 0);
+                    window.draw(pauseText);
+                }
+                window.draw(pauseButton);
             window.display();
             lose = checkLose();
         }
@@ -168,7 +217,6 @@ void Game::run()
         }
     }
 }
-
 void Game::init()
 {
     srand(time(NULL));

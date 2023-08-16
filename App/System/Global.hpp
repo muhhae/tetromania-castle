@@ -6,6 +6,8 @@ const static std::string g_resourcePath = "Resources/";
 const static std::string g_fontPath = g_resourcePath + "Fonts/";
 const static std::string g_backgroundPath = g_resourcePath + "Backgrounds/"; 
 const static std::string g_blockPath = g_resourcePath + "Blocks/"; 
+const static std::string g_UIPath = g_resourcePath + "UI/";
+const static std::string g_buttonPath = g_UIPath + "Buttons/";
 
 const static std::string g_selectedFont = g_fontPath + "firaFont.ttf";
 const static std::string g_selectedBackground = g_backgroundPath + "castle.jpg";
