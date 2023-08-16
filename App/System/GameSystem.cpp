@@ -1,36 +1,23 @@
 #include "GameSystem.hpp"
+#include "UI/Button.hpp"
 
 void Game::run()
 {
-    srand(time(NULL));
-    sf::RenderWindow window(sf::VideoMode(600, 800), "SFML works!", sf::Style::Close);
-    sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));
-    window.setView(view);
-    
-    g_screen.bottom = view.getSize().y / 2;
-    g_screen.top = view.getSize().y / -2;
-    g_screen.left = view.getSize().x / -2;
-    g_screen.right = view.getSize().x / 2;
-    
-    g_screen.width = view.getSize().x;
-    g_screen.height = view.getSize().y;
+    init();
         
     sf::Clock clock;
     sf::Time dt;
     
     sf::Text scoreText;
-    sf::Font firaFont;
     
     sf::Texture backgroundTexture;
-    backgroundTexture.loadFromFile("Resource/Background/castle.jpg");
+    backgroundTexture.loadFromFile(g_selectedBackground);
     sf::Sprite background(backgroundTexture);
     background.setPosition(g_screen.left - 500, g_screen.top);
     background.scale(2, 2);
     // background.setColor(sf::Color(128, 128, 128, 255));
     
-    firaFont.loadFromFile("Resource/Font/firaFont.ttf");
-    
-    scoreText.setFont(firaFont);
+    scoreText.setFont(g_font);
     scoreText.setColor(sf::Color::White);
     scoreText.setPosition(g_screen.left + 10, g_screen.top + 10);
     scoreText.setCharacterSize(30);
@@ -116,13 +103,13 @@ void Game::run()
                         blockClusters.clear();
                         instantiate(randomShape(), 
                                     randomPosition(), 
-                                    sf::Color::Red, 
+                                    randomColor(), 
                                     50);
                     }
                 }
             }
             sf::Text loseText;
-            loseText.setFont(firaFont);
+            loseText.setFont(g_font);
             loseText.setColor(sf::Color::White);
             loseText.setCharacterSize(50);
             loseText.setString("GAME OVER");
@@ -130,7 +117,7 @@ void Game::run()
             loseText.setPosition(0, -50);
             
             sf::Text scoreText;
-            scoreText.setFont(firaFont);
+            scoreText.setFont(g_font);
             scoreText.setColor(sf::Color::White);
             scoreText.setCharacterSize(30);
             scoreText.setString("Your score: " + std::to_string(g_score));
@@ -138,30 +125,52 @@ void Game::run()
             scoreText.setPosition(0, 50);
             
             sf::Text tryAgain;
-            tryAgain.setFont(firaFont);
+            tryAgain.setFont(g_font);
             tryAgain.setColor(sf::Color::White);
             tryAgain.setCharacterSize(30);
             tryAgain.setString("Press space to try again");
             tryAgain.setOrigin(tryAgain.getLocalBounds().width / 2, tryAgain.getLocalBounds().height / 2);
             tryAgain.setPosition(0, 100);
             
+            Button button;
+            button.setButtonPosition(sf::Vector2f(0, 200))
+                  .setOrigin(sf::Vector2f(100, 25))
+                  .setButtonSize(sf::Vector2f(200, 50))
+                  .setButtonColor(sf::Color::Red)
+                  .setButtonOnHover([&]()
+                                    {
+                                        button.setButtonColor(sf::Color::Green);
+                                    });
+            
+            button.update(window);
+            
             window.clear(sf::Color::Black);
+                window.draw(background);
                 window.draw(loseText);
                 window.draw(scoreText);
                 window.draw(tryAgain);
+                window.draw(button);
             window.display();
         }
     }
 }
 
-void Game::initGameScreen(int width, int height)
+void Game::init()
 {
-    g_screen.width = width;
-    g_screen.height = height;
-    g_screen.top = -height / 2;
-    g_screen.bottom = height / 2;
-    g_screen.left = -width / 2;
-    g_screen.right = width / 2;
+    srand(time(NULL));
+    
+    sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));   
+    window.setView(view);
+    
+    g_screen.bottom = view.getSize().y / 2;
+    g_screen.top = view.getSize().y / -2;
+    g_screen.left = view.getSize().x / -2;
+    g_screen.right = view.getSize().x / 2;
+    
+    g_screen.width = view.getSize().x;
+    g_screen.height = view.getSize().y;
+    
+    g_font.loadFromFile(g_selectedFont);
 }
 void Game::instantiate(BlockCluster::Shape shape, 
                        sf::Vector2f position,
@@ -193,7 +202,11 @@ void Game::betterCheckLine()
         auto& blocks = bc.getBlocks();
         for (auto& block : blocks)
         {
-            auto iter = std::find_if(lines.begin(), lines.end(), [&](lineInfo& line){return line.y == block.getPosition().y;});
+            auto iter = std::find_if(lines.begin(), lines.end(), 
+                                                            [&](lineInfo& line) 
+                                                            {
+                                                                return line.y == block.getPosition().y;
+                                                            });
             if (iter != lines.end())
             {
                 iter->count++;
@@ -201,8 +214,7 @@ void Game::betterCheckLine()
             else
             {
                 lines.push_back(lineInfo(block.getPosition().y, 1));
-            }
-            
+            } 
         }
     }
     
@@ -243,21 +255,6 @@ void Game::betterCheckLine()
             moveBlock(it->second, sf::Vector2f(0, it->second.getSize().y));
         }
     }
-    
-    // for (int i = 0; i < lineCount; i++)
-    // {
-    //     std::cout << "\nMoving down\n";
-    //     for (auto& blockCluster : blockClusters)
-    //     {
-    //         for (auto& block : blockCluster.getBlocks())
-    //         {
-    //             if (!moveBlock(block, sf::Vector2f(0, block.getSize().y)))
-    //             {
-    //                 std::cout << "fail\n";
-    //             }
-    //         }
-    //     }
-    // }
 }
 bool Game::input(BlockCluster& blockCluster, sf::Event event)
 {

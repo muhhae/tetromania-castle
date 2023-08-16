@@ -22,12 +22,8 @@ public : //public function
     // @param none
     // @return none
     void run();
+    void init();
 private : //private function
-    // @brief Initialize the game screen
-    // @param width of the screen
-    // @param height of the screen
-    // @return none
-    void initGameScreen(int width, int height);
     // @brief Instantiate a block cluster
     // @param shape of the block cluster
     // @param position of the block cluster
@@ -70,6 +66,9 @@ private : //private struct
 private : //private variable
     std::vector<BlockCluster> blockClusters;
     int g_score = 0;
+    
+    sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "SFML works!", sf::Style::Close);
+    sf::View view;
         
 };
 

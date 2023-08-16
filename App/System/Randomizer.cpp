@@ -10,6 +10,8 @@ BlockCluster::Shape randomShape()
 
 sf::Color randomColor()
 {
+    return sf::Color::White;
+    
     std::array<sf::Color, 4> colors = {sf::Color::Red, sf::Color::Blue, sf::Color::Green, sf::Color::Yellow};
     sf::Color color = colors[rand() % colors.size()];
     color.r /= 2;
