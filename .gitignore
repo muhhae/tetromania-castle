@@ -2,6 +2,8 @@
 **/*.vcxproj
 **/*.vcxproj.filters
 
+.vscode
+
 bin
 obj
 
