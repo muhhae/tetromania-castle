@@ -16,8 +16,16 @@ public:
     Button& setButtonColor(sf::Color color) {m_button.setFillColor(color); return *this;}
     Button& setButtonOutlineColor(sf::Color color) {m_button.setOutlineColor(color); return *this;}
     Button& setButtonOutlineThickness(float thickness) {m_button.setOutlineThickness(thickness); return *this;}
+    Button& setButtonTexture(sf::Texture* texture) {m_button.setTexture(texture); return *this;}
     
     Button& setFont(sf::Font font) {m_font = font; return *this;}
+    Button& setTextCenter()
+    {
+        sf::FloatRect textRect = m_text.getLocalBounds();
+        m_text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+        
+        return *this;
+    }
     Button& setTextString(std::string string) {m_text.setString(string); return *this;}
     Button& setTextSize(unsigned int size) {m_text.setCharacterSize(size); return *this;}
     Button& setTextColor(sf::Color color) {m_text.setFillColor(color); return *this;}

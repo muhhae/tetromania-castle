@@ -136,17 +136,27 @@ void Game::run()
             button.setButtonPosition(sf::Vector2f(0, 200))
                   .setOrigin(sf::Vector2f(100, 25))
                   .setButtonSize(sf::Vector2f(200, 50))
+                  .setButtonOutlineThickness(5)
+                  .setButtonOutlineColor(sf::Color::Green)
                   .setButtonColor(sf::Color::Red)
-                  .setButtonOnHover([&]()
-                                    {
-                                        button.setButtonColor(sf::Color::Green);
-                                    })
-                  .setButtonOnClick([&]()
-                                    {
-                                        g_score += 1000;
-                                    });
                   
-            button.update(window);
+                  .setTextPosition(sf::Vector2f(0, 200))
+                  .setTextString("TRY AGAIN")
+                  .setTextSize(30)
+                  .setTextCenter()
+                  .setFont(g_font)
+                  
+                  .setButtonOnHover([&]()
+                    {
+                        button.setButtonOutlineColor(sf::Color::Red);
+                        button.setButtonColor(sf::Color::Green);
+                        button.setTextColor(sf::Color::Red);
+                    })
+                  .setButtonOnClick([&]()
+                    {
+                        g_score += 1000;
+                    })
+                  .update(window);
             
             window.clear(sf::Color::Black);
                 window.draw(background);
