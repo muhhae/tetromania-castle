@@ -23,5 +23,5 @@ sf::Color randomColor()
 sf::Vector2f randomPosition()
 {
     int tile = (g_screen.width - 300) / 50;
-    return sf::Vector2f((rand() % tile) * 50 - g_screen.right + 150, g_screen.top);
+    return sf::Vector2f((rand() % tile) * 50 - g_screen.right + 150, g_screen.top - 100);
 }

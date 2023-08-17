@@ -13,7 +13,7 @@ const static std::string g_buttonPath = g_UIPath + "Buttons/";
 
 const static std::string firaFontPath = g_fontPath + "firaFont.ttf";
 const static std::string castleBackgroundPath = g_backgroundPath + "castle.jpg";
-const static std::string blockTexturePath = g_blockPath + "brick_1.png";
+const static std::string blockTexturePath = g_blockPath + "pixel_block.png";
 const static std::string buttonTexturePath = g_buttonPath + "button.png";
 const static std::string buttonOnHoverTexturePath = g_buttonPath + "button_on_hover.png";
 const static std::string pauseButtonTexturePath = g_buttonPath + "pause_1.png";

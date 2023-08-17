@@ -135,6 +135,16 @@ void GameplayScene::run(sf::RenderWindow& window)
         if (g_currentScene != enumScene::gameplay) break;
         dt_fixed = clock.restart();
         dt = dt_fixed * TimeScale;
+        
+        const static float maxTimeSpeed = 2;
+        static float timeSpeed = 1; 
+        
+        static float elapsedTime = 0;
+        elapsedTime += dt.asSeconds() * timeSpeed;
+        
+        static float elapsedTime_fixed = 0;
+        elapsedTime_fixed += dt_fixed.asSeconds();   
+        
         if (!lose)
         {
             sf::Event event;
@@ -143,6 +153,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             {
                 bool inputResult = false;
                 if (TimeScale) inputResult = input(blockClusters.back(), event);
+                if (inputResult && event.key.code == sf::Keyboard::Down) elapsedTime = 0;
                 
                 if (event.type == sf::Event::Closed)
                     window.close();
@@ -160,31 +171,28 @@ void GameplayScene::run(sf::RenderWindow& window)
                         else
                             TimeScale = 1;
                     }
-                    if (event.key.code == sf::Keyboard::X)
-                    {
-                        instantiate(randomShape(), 
-                                    randomPosition(), 
-                                    sf::Color::Red, 
-                                    50);
-                    }
                 }
             }
             
-            static float elapsedTime = 0;
-            elapsedTime += dt.asSeconds();
-            
             if (elapsedTime >= 1)
             {
-                fps = 1 / dt.asSeconds();
                 elapsedTime = 0;
                 if (!moveBlockCluster(blockClusters.back(), sf::Vector2f(0, blockClusters.back().getSize())))
                 {
+                    if (timeSpeed < maxTimeSpeed) timeSpeed += 0.1;
                     betterCheckLine();
                     instantiate(randomShape(), 
                                 randomPosition(), 
                                 randomColor(), 
                                 50);
+                    for (int i = 0; i < rand() % 4; i++) rotateBlockCluster(blockClusters.back());
                 }
+            }
+            
+            if (elapsedTime_fixed >= 1)
+            {
+                elapsedTime_fixed = 0;
+                fps = 1 / dt_fixed.asSeconds();
             }
             
             fpsText.setString("FPS: " + std::to_string(fps));
