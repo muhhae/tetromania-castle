@@ -15,7 +15,7 @@ void BlockCluster::create()
     
     block.setSize(sf::Vector2f(m_size, m_size))
          .setColor(m_color)
-         .setTexture(getTexture(blockTexturePath))
+         .setTexture(getTexture(g_blockPath + "block_" + std::to_string(rand() % 4 + 1) + ".png"))
          .setPosition(m_position);
          
     for (int i = 0; i < 4; i++)

@@ -11,9 +11,16 @@ void GameplayScene::run(sf::RenderWindow& window)
     int fps = 0;
     
     sf::Text scoreText;
-    sf::Sprite background(getTexture(castleBackgroundPath));
-    background.setPosition(g_screen.left - 500, g_screen.top);
-    background.scale(2, 2);
+    sf::Sprite background(getTexture(g_backgroundPath + "bg.png"));
+    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
+    background.setPosition(0, -100);
+    background.scale(3, 3);
+    
+    sf::RectangleShape bg_overlay;
+    bg_overlay.setSize(sf::Vector2f(g_screen.width, g_screen.height));
+    bg_overlay.setFillColor(sf::Color(0, 0, 0, 64));
+    bg_overlay.setOrigin(bg_overlay.getLocalBounds().width / 2, bg_overlay.getLocalBounds().height / 2);
+    bg_overlay.setPosition(0, 0);
     
     scoreText.setFont(g_font);
     scoreText.setColor(sf::Color::White);
@@ -201,8 +208,9 @@ void GameplayScene::run(sf::RenderWindow& window)
             pauseButton.update(window);
 
             
-            window.clear(sf::Color::Black);
+            window.clear(g_screenColor);
                 window.draw(background);
+                window.draw(bg_overlay);
                 for (const auto& blockCluster : blockClusters)
                     window.draw(blockCluster);
                 
@@ -261,7 +269,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             menuButton.update(window);
             quitButton.update(window);
             
-            window.clear(sf::Color::Black);
+            window.clear(g_screenColor);
                 window.draw(background);
                 window.draw(loseText);
                 window.draw(scoreText);

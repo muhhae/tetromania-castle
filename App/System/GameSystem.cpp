@@ -4,7 +4,7 @@
 
 void Game::run()
 {   
-    sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetris", sf::Style::Close);
+    sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetromino Castle", sf::Style::Close);
     sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));   
     window.setView(view);
     
@@ -69,8 +69,15 @@ void Game::run()
     Scene * scene = new GameplayScene();
     
     sf::Sprite background(getTexture(castleBackgroundPath));
-    background.setPosition(g_screen.left - 500, g_screen.top);
-    background.scale(2, 2);
+    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
+    background.setPosition(0, -200);
+    background.setScale(3.5, 3.5);
+    
+    sf::RectangleShape bg_overlay;
+    bg_overlay.setSize(sf::Vector2f(g_screen.width, g_screen.height));
+    bg_overlay.setFillColor(sf::Color(0, 0, 0, 64));
+    bg_overlay.setOrigin(bg_overlay.getLocalBounds().width / 2, bg_overlay.getLocalBounds().height / 2);
+    bg_overlay.setPosition(0, 0);
     
     while (window.isOpen())
     {
@@ -87,8 +94,9 @@ void Game::run()
                         window.close();
                 }
             }
-            window.clear(sf::Color::Black);
+            window.clear(g_screenColor);
             window.draw(background);
+            window.draw(bg_overlay);
             
             playButton.update(window);
             quitButton.update(window);
