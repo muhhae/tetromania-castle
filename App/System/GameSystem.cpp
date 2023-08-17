@@ -93,8 +93,47 @@ void Game::run()
     bgm.setVolume(5);
     bgm.play();
     
+    std::array<float, 6> lightRadius = {15, 25, 40, 25, 25, 40};
+    std::array<sf::Vector2f, 6> lightPositions = 
+        { 
+            sf::Vector2f(-202, -9),
+            sf::Vector2f(-127, -28),
+            sf::Vector2f(-117, -95),
+            sf::Vector2f(-47, -105),
+            sf::Vector2f(65, -104),
+            sf::Vector2f(141, -86)
+        };
+    std::array<sf::CircleShape, 6> lights;
+    
+    for (int i = 0; i < lights.size(); ++i)
+    {
+        lights[i].setRadius(lightRadius[i]);
+        lights[i].setOrigin(lights[i].getLocalBounds().width / 2, lights[i].getLocalBounds().height / 2);
+        lights[i].setFillColor(sf::Color(255, 210, 28, 20));
+        lights[i].setPosition(lightPositions[i]);
+    }
+    
+    sf::Clock clock;
+    sf::Time dt;
+    
     while (window.isOpen())
     {
+        dt = clock.restart();
+        
+        static float lightTime = 0;
+        lightTime += dt.asSeconds();
+        if (lightTime >= 0.1)
+        {
+            lightTime = 0;
+            for (int i = 0; i < lights.size(); ++i)
+            {
+                float scale = rand() % 20 + 90;
+                scale /= 100;
+                lights[i].setRadius(lightRadius[i] * scale);
+                lights[i].setOrigin(lights[i].getLocalBounds().width / 2, lights[i].getLocalBounds().height / 2);
+            }
+        }
+           
         if (g_currentScene == enumScene::menu)
         {
             sf::Event event;
@@ -107,10 +146,22 @@ void Game::run()
                     if (event.key.code == sf::Keyboard::Escape)
                         window.close();
                 }
+                if (event.type == sf::Event::MouseButtonPressed)
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                        std::cout << mousePos.x << "," << mousePos.y << std::endl;
+                    }
+                }
             }
             window.clear(g_screenColor);
             window.draw(background);
             window.draw(bg_overlay);
+            
+            for(auto & light : lights)
+                window.draw(light);
+            
             window.draw(title);
             
             playButton.update(window);

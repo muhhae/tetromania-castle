@@ -269,7 +269,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             }
             
             static float lightTime = 0;
-            lightTime += dt_fixed.asSeconds();
+            lightTime += dt.asSeconds();
             if (lightTime >= 0.1)
             {
                 lightTime = 0;
