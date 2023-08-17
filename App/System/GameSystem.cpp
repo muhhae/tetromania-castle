@@ -2,6 +2,8 @@
 #include "Scene/GameplayScene.hpp"
 #include "UI/Button.hpp"
 
+#include <SFML/Audio.hpp>
+
 void Game::run()
 {   
     sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetromino Castle", sf::Style::Close);
@@ -84,6 +86,12 @@ void Game::run()
     title.setOrigin(title.getLocalBounds().width / 2, title.getLocalBounds().height / 2);
     title.setPosition(0, -250);
     title.setScale(0.4, 0.45);
+    
+    sf::Music bgm;
+    bgm.openFromFile(g_bgmPath);
+    bgm.setLoop(true);
+    bgm.setVolume(5);
+    bgm.play();
     
     while (window.isOpen())
     {

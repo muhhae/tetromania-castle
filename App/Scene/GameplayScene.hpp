@@ -1,5 +1,6 @@
 #pragma once
 #include "System/Scene.hpp"
+#include <SFML/Audio.hpp>
 
 class GameplayScene : public Scene
 {
@@ -12,7 +13,7 @@ class GameplayScene : public Scene
                      sf::Vector2f position = sf::Vector2f(0, 0),
                      sf::Color color = sf::Color::Red, 
                      float size = 50);
-        void betterCheckLine();
+        bool betterCheckLine();
         bool input(BlockCluster& blockCluster, sf::Event event);
         bool moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f offset);
         bool rotateBlockCluster(BlockCluster& blockCluster);

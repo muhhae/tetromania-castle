@@ -1,6 +1,8 @@
 #include "GameplayScene.hpp"
 #include "UI/Button.hpp"
 
+#include <SFML/Audio.hpp>
+
 void GameplayScene::run(sf::RenderWindow& window)
 {
     sf::Clock clock;
@@ -160,6 +162,26 @@ void GameplayScene::run(sf::RenderWindow& window)
         lights[i].setPosition(lightPositions[i]);
     }
     
+    sf::SoundBuffer candleBuffer;
+    candleBuffer.loadFromFile(g_candlePath);
+    sf::Sound candleSound;
+    candleSound.setBuffer(candleBuffer);
+    candleSound.setLoop(true);
+    candleSound.setVolume(20);
+    candleSound.play();
+    
+    sf::SoundBuffer crumblingBuffer;
+    sf::Sound crumblingSound;
+    sf::SoundBuffer fallingBuffer;
+    sf::Sound fallingSound;
+    
+    crumblingBuffer.loadFromFile(g_crumblingPath);
+    crumblingSound.setBuffer(crumblingBuffer);
+    
+    fallingBuffer.loadFromFile(g_fallingPath);
+    fallingSound.setBuffer(fallingBuffer);
+    fallingSound.setPlayingOffset(sf::seconds(1));
+    
     while (window.isOpen())
     {
         if (g_currentScene != enumScene::gameplay) break;
@@ -183,6 +205,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             {
                 bool inputResult = false;
                 if (TimeScale) inputResult = input(blockClusters.back(), event);
+                
                 if (inputResult && event.key.code == sf::Keyboard::Down) elapsedTime = 0;
                 
                 if (event.type == sf::Event::Closed)
@@ -191,6 +214,10 @@ void GameplayScene::run(sf::RenderWindow& window)
                 {
                     view.setSize(event.size.width, event.size.height);
                     window.setView(view);
+                }
+                if (event.type == sf::Event::LostFocus)
+                {
+                    TimeScale = 0;
                 }
                 if (event.type == sf::Event::KeyReleased)
                 {
@@ -213,13 +240,26 @@ void GameplayScene::run(sf::RenderWindow& window)
                 }
             }
             
+            static bool soundPlayed = false;
+            if (!moveBlockCluster(blockClusters.back(), sf::Vector2f(0, blockClusters.back().getSize())))
+            {
+                if (!soundPlayed)
+                    fallingSound.play();
+                soundPlayed = true;
+            }
+            else
+            {
+                moveBlockCluster(blockClusters.back(), sf::Vector2f(0, -blockClusters.back().getSize()));
+                soundPlayed = false;
+            }
+            
             if (elapsedTime >= 1)
             {
                 elapsedTime = 0;
                 if (!moveBlockCluster(blockClusters.back(), sf::Vector2f(0, blockClusters.back().getSize())))
                 {
                     if (timeSpeed < maxTimeSpeed) timeSpeed += 0.1;
-                    betterCheckLine();
+                    if (betterCheckLine()) crumblingSound.play();
                     instantiate(randomShape(), 
                                 randomPosition(), 
                                 randomColor(), 
@@ -354,77 +394,85 @@ void GameplayScene::instantiate(BlockCluster::Shape shape,
                         .setShape(shape);
     blockClusters.back().create();   
 }
-void GameplayScene::betterCheckLine()
-{
-    const int maxLine = 12;
-    
-    struct lineInfo
+bool GameplayScene::betterCheckLine()
+{   
+    bool trueResult = false;
+    while (1)
     {
-        lineInfo(float y, int count) : y(y), count(count) {}
-        float y;
-        int count = 0;
-    };
-    
-    std::vector<lineInfo> lines;
-    
-    for (auto& bc : blockClusters)
-    {
-        auto& blocks = bc.getBlocks();
-        for (auto& block : blocks)
+        const int maxLine = 12;
+        
+        struct lineInfo
         {
-            auto iter = std::find_if(lines.begin(), lines.end(), 
-                                                            [&](lineInfo& line) 
-                                                            {
-                                                                return line.y == block.getPosition().y;
-                                                            });
-            if (iter != lines.end())
+            lineInfo(float y, int count) : y(y), count(count) {}
+            float y;
+            int count = 0;
+        };
+        
+        std::vector<lineInfo> lines;
+        
+        for (auto& bc : blockClusters)
+        {
+            auto& blocks = bc.getBlocks();
+            for (auto& block : blocks)
             {
-                iter->count++;
+                auto iter = std::find_if(lines.begin(), lines.end(), 
+                                                                [&](lineInfo& line) 
+                                                                {
+                                                                    return line.y == block.getPosition().y;
+                                                                });
+                if (iter != lines.end())
+                {
+                    iter->count++;
+                }
+                else
+                {
+                    lines.push_back(lineInfo(block.getPosition().y, 1));
+                } 
             }
-            else
+        }
+        
+        int lineCount = 0;
+        
+        for (auto& line : lines)
+        {
+            if (line.count >= maxLine)
             {
-                lines.push_back(lineInfo(block.getPosition().y, 1));
-            } 
+                lineCount++;
+                g_score += 1000;
+                for (auto & blockCluster : blockClusters)
+                {
+                    auto & blocks = blockCluster.getBlocks();
+                    
+                    deleteAll<Block>(blocks, [&](Block& block){return block.getPosition().y == line.y;});
+                }  
+            }
         }
-    }
-    
-    int lineCount = 0;
-    
-    for (auto& line : lines)
-    {
-        if (line.count >= maxLine)
+        
+        if (lineCount <= 0) break;
+        
+        deleteAll<BlockCluster>(blockClusters, [&](BlockCluster& blockCluster){return blockCluster.getBlocks().empty();});
+        std::multimap<float, Block&> OrderedBlockMap;
+        
+        for (auto& blockCluster : blockClusters)
         {
-            lineCount++;
-            g_score += 1000;
-            for (auto & blockCluster : blockClusters)
+            for (auto& block : blockCluster.getBlocks())
             {
-                auto & blocks = blockCluster.getBlocks();
-                
-                deleteAll<Block>(blocks, [&](Block& block){return block.getPosition().y == line.y;});
-            }  
+                OrderedBlockMap.insert(std::pair<float, Block&>(block.getPosition().y, block));
+            }
         }
-    }
-    
-    if (lineCount <= 0) return;
-    
-    deleteAll<BlockCluster>(blockClusters, [&](BlockCluster& blockCluster){return blockCluster.getBlocks().empty();});
-    std::multimap<float, Block&> OrderedBlockMap;
-    
-    for (auto& blockCluster : blockClusters)
-    {
-        for (auto& block : blockCluster.getBlocks())
+        
+        for (auto it = OrderedBlockMap.rbegin(); it != OrderedBlockMap.rend(); ++it)
         {
-            OrderedBlockMap.insert(std::pair<float, Block&>(block.getPosition().y, block));
+            for (int i = 0; i < lineCount; i++)
+            {
+                moveBlock(it->second, sf::Vector2f(0, it->second.getSize().y));
+            }
         }
+        
+        trueResult = true;
     }
     
-    for (auto it = OrderedBlockMap.rbegin(); it != OrderedBlockMap.rend(); ++it)
-    {
-        for (int i = 0; i < lineCount; i++)
-        {
-            moveBlock(it->second, sf::Vector2f(0, it->second.getSize().y));
-        }
-    }
+    return trueResult;
 }
 bool GameplayScene::input(BlockCluster& blockCluster, sf::Event event)
 {
@@ -452,8 +500,6 @@ bool GameplayScene::moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f of
             block.getPosition().x + offset.x >= g_screen.right ||
             block.getPosition().y + offset.y >= g_screen.bottom)
         {
-            // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-            // std::cout << "Out of bound" <<std::endl;
             return false;
         }
     }
@@ -468,8 +514,6 @@ bool GameplayScene::moveBlockCluster(BlockCluster& blockCluster, sf::Vector2f of
             {   
                 if (block.getPosition() + offset == b.getPosition())
                 {
-                    // std::cout << "\nPos : " << block.getPosition().x + offset.x << ", " << block.getPosition().y + offset.y << std::endl;
-                    // std::cout << "Collide" <<std::endl;
                     return false;
                 }
             }
