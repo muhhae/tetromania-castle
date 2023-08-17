@@ -8,7 +8,6 @@ workspace "App"
     platforms { "x64" }
 
 project "App"
-    kind "ConsoleApp" --App Type
     language "C++" --Languange
 
     cppdialect "C++latest"
@@ -42,9 +41,15 @@ project "App"
     }
 
     filter "configurations:Debug"
+        kind "ConsoleApp"
         defines { "DEBUG" }
         symbols "On"
 
     filter "configurations:Release"
-        defines { "RELEASE" }
+        kind "WindowedApp"
+        entrypoint "mainCRTStartup"
+        defines { "NDEBUG" }
         optimize "On"
+        postbuildcommands {
+            "{COPY} %{wks.location}Resources %{cfg.targetdir}/Resources"
+        }

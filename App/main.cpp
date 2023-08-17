@@ -1,7 +1,14 @@
 #include "System/GameSystem.hpp"
+#include <filesystem>
 
-int main()
+int main(const int argc, const char** argv)
 {
+    #ifdef NDEBUG
+        std::string exedir = argv[0];
+        std::string exepath = exedir.substr(0, exedir.find_last_of("\\/"));
+        std::filesystem::current_path(exepath);
+    #endif //NDEBUG
+    
     try
     {
         Game game;

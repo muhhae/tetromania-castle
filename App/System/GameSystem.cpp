@@ -3,9 +3,7 @@
 #include "UI/Button.hpp"
 
 void Game::run()
-{
-    std::cout << "Game is starting" << std::endl;
-    
+{   
     sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetris", sf::Style::Close);
     sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));   
     window.setView(view);
@@ -101,7 +99,6 @@ void Game::run()
         }
         else 
         {
-            std::cout << "Game is running" << std::endl;
             scene->init(window);
             scene->run(window);
         }
