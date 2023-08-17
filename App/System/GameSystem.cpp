@@ -70,7 +70,7 @@ void Game::run()
     
     sf::Sprite background(getTexture(castleBackgroundPath));
     background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
-    background.setPosition(0, -200);
+    background.setPosition(0, -170);
     background.setScale(3.5, 3.5);
     
     sf::RectangleShape bg_overlay;
@@ -78,6 +78,12 @@ void Game::run()
     bg_overlay.setFillColor(sf::Color(0, 0, 0, 64));
     bg_overlay.setOrigin(bg_overlay.getLocalBounds().width / 2, bg_overlay.getLocalBounds().height / 2);
     bg_overlay.setPosition(0, 0);
+    
+    sf::Sprite title;
+    title.setTexture(getTexture(g_titleTexturePath));
+    title.setOrigin(title.getLocalBounds().width / 2, title.getLocalBounds().height / 2);
+    title.setPosition(0, -250);
+    title.setScale(0.4, 0.45);
     
     while (window.isOpen())
     {
@@ -97,6 +103,7 @@ void Game::run()
             window.clear(g_screenColor);
             window.draw(background);
             window.draw(bg_overlay);
+            window.draw(title);
             
             playButton.update(window);
             quitButton.update(window);

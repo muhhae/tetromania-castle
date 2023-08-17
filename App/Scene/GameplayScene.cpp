@@ -136,6 +136,29 @@ void GameplayScene::run(sf::RenderWindow& window)
             {
                 window.close();
             });
+            
+    sf::RectangleShape pauseBackground(sf::Vector2f(g_screen.width, g_screen.height));
+    pauseBackground.setFillColor(sf::Color(0, 0, 0, 128));
+    pauseBackground.setOrigin(pauseBackground.getLocalBounds().width / 2, pauseBackground.getLocalBounds().height / 2);
+    pauseBackground.setPosition(0, 0);
+    
+    std::array<float, 4> lightRadius = {30, 30, 60, 70};
+    std::array<sf::Vector2f, 4> lightPositions = 
+        { 
+            sf::Vector2f(-125, -48), 
+            sf::Vector2f(70, -48), 
+            sf::Vector2f(-78, 123), 
+            sf::Vector2f(163, 125) 
+        };
+    std::array<sf::CircleShape, 4> lights;
+    
+    for (int i = 0; i < lights.size(); ++i)
+    {
+        lights[i].setRadius(lightRadius[i]);
+        lights[i].setOrigin(lights[i].getLocalBounds().width / 2, lights[i].getLocalBounds().height / 2);
+        lights[i].setFillColor(sf::Color(255, 210, 28, 20));
+        lights[i].setPosition(lightPositions[i]);
+    }
     
     while (window.isOpen())
     {
@@ -179,6 +202,15 @@ void GameplayScene::run(sf::RenderWindow& window)
                             TimeScale = 1;
                     }
                 }
+                if (event.type == sf::Event::MouseButtonPressed)
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                        sf::Vector2f mousePosition_world = window.mapPixelToCoords(mousePosition);
+                        std::cout << mousePosition_world.x << ", " << mousePosition_world.y << std::endl;
+                    }
+                }
             }
             
             if (elapsedTime >= 1)
@@ -196,8 +228,21 @@ void GameplayScene::run(sf::RenderWindow& window)
                 }
             }
             
-            if (elapsedTime_fixed >= 1)
+            static float lightTime = 0;
+            lightTime += dt_fixed.asSeconds();
+            if (lightTime >= 0.1)
             {
+                lightTime = 0;
+                for (int i = 0; i < lights.size(); ++i)
+                {
+                    float scale = rand() % 20 + 90;
+                    scale /= 100;
+                    lights[i].setRadius(lightRadius[i] * scale);
+                    lights[i].setOrigin(lights[i].getLocalBounds().width / 2, lights[i].getLocalBounds().height / 2);
+                }
+            }
+            if (elapsedTime_fixed >= 0.4)
+            {   
                 elapsedTime_fixed = 0;
                 fps = 1 / dt_fixed.asSeconds();
             }
@@ -211,15 +256,13 @@ void GameplayScene::run(sf::RenderWindow& window)
             window.clear(g_screenColor);
                 window.draw(background);
                 window.draw(bg_overlay);
+                for (const auto& light : lights)
+                    window.draw(light);
                 for (const auto& blockCluster : blockClusters)
                     window.draw(blockCluster);
                 
                 if (TimeScale == 0)
                 {
-                    sf::RectangleShape pauseBackground(sf::Vector2f(g_screen.width, g_screen.height));
-                    pauseBackground.setFillColor(sf::Color(0, 0, 0, 128));
-                    pauseBackground.setOrigin(pauseBackground.getLocalBounds().width / 2, pauseBackground.getLocalBounds().height / 2);
-                    pauseBackground.setPosition(0, 0);
                     window.draw(pauseBackground);
                     
                     sf::Text pauseText = sf::Text("PAUSE", g_font, 80);
@@ -271,6 +314,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             
             window.clear(g_screenColor);
                 window.draw(background);
+                window.draw(pauseBackground);
                 window.draw(loseText);
                 window.draw(scoreText);
                 window.draw(quitButton);
