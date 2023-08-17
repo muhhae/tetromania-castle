@@ -12,3 +12,14 @@ sf::Texture& getTexture(const std::string & path)
     }
     return textures[path];
 }
+
+void initScreen(sf::View & view)
+{
+    g_screen.bottom = view.getSize().y / 2;
+    g_screen.top = view.getSize().y / -2;
+    g_screen.left = view.getSize().x / -2;
+    g_screen.right = view.getSize().x / 2;
+    
+    g_screen.width = view.getSize().x;
+    g_screen.height = view.getSize().y;
+}

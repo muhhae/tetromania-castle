@@ -2,8 +2,7 @@
 
 #include <functional>
 #include <SFML/Graphics.hpp>
-
-#include "Global.hpp"
+#include "System/Global.hpp"
 
 class Button : public sf::Drawable
 {
@@ -19,13 +18,7 @@ public:
     Button& setButtonTexture(sf::Texture& texture) {m_button.setTexture(&texture); return *this;}
     
     Button& setFont(sf::Font font) {m_font = font; return *this;}
-    Button& setTextCenter()
-    {
-        sf::FloatRect textRect = m_text.getLocalBounds();
-        m_text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
-        
-        return *this;
-    }
+    Button& setTextCenter();
     Button& setTextString(std::string string) {m_text.setString(string); return *this;}
     Button& setTextSize(unsigned int size) {m_text.setCharacterSize(size); return *this;}
     Button& setTextColor(sf::Color color) {m_text.setFillColor(color); return *this;}
@@ -35,36 +28,8 @@ public:
     Button& setButtonOnHover(std::function<void()> functionOnHover) {m_onHover = functionOnHover; return *this;}
     Button& setButtonOnUpdate(std::function<void()> functionOnUpdate) {m_onUpdate = functionOnUpdate; return *this;}
     
-    void update(const sf::RenderWindow & window)
-    {
-        if (m_onUpdate) m_onUpdate();
-        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        if (m_button.getGlobalBounds().contains(mousePosition) && m_onHover)
-        {
-            m_onHover();
-        }
-        
-        if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        {
-            isMouseDown = false;
-        }
-        
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) 
-            && m_button.getGlobalBounds().contains(mousePosition)
-            && m_onClick)
-        {
-            if (!isMouseDown)
-            {
-                m_onClick();
-                isMouseDown = true;
-            }
-        }
-    }
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const
-    {
-        target.draw(m_button);
-        target.draw(m_text);
-    }
+    void update(const sf::RenderWindow & window);
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
     sf::RectangleShape m_button = sf::RectangleShape(sf::Vector2f(100, 50));
     sf::Text m_text = sf::Text("Button", g_font, 20);
@@ -77,6 +42,4 @@ private:
     
     static bool isMouseDown;
 };
-
-bool Button::isMouseDown = false;
 
