@@ -26,11 +26,11 @@ links {
 
 Credit
 -
-bgm : https://pixabay.com/users/gioelefazzeri-16466931/
-UI : https://mounirtohami.itch.io/pixel-art-gui-elements
-Art : https://ansimuz.itch.io/
-candleSFX : https://pixabay.com/sound-effects/candle-buzz-3-50319/
-crumblingSFX : https://pixabay.com/sound-effects/stone-debris-109593/
-fallingSFX : https://pixabay.com/sound-effects/brick-dropped-on-other-bricks-14722/
+- bgm : https://pixabay.com/users/gioelefazzeri-16466931/
+- UI : https://mounirtohami.itch.io/pixel-art-gui-elements
+- Art : https://ansimuz.itch.io/
+- candleSFX : https://pixabay.com/sound-effects/candle-buzz-3-50319/
+- crumblingSFX : https://pixabay.com/sound-effects/stone-debris-109593/
+- fallingSFX : https://pixabay.com/sound-effects/brick-dropped-on-other-bricks-14722/
 
 
