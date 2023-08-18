@@ -12,8 +12,6 @@ void Game::run()
     
     initScreen(view);
     
-    g_font.loadFromFile(firaFontPath);
-    
     Button playButton;
     playButton.setButtonPosition(sf::Vector2f(0, 200))
             .setOrigin(sf::Vector2f(115, 40))
@@ -24,7 +22,7 @@ void Game::run()
             .setTextString("PLAY")
             .setTextSize(30)
             .setTextCenter()
-            .setFont(g_font)
+            .setFont(getGlobalFont())
             
             .setButtonOnHover([&]()
             {
@@ -51,7 +49,7 @@ void Game::run()
             .setTextString("QUIT")
             .setTextSize(30)
             .setTextCenter()
-            .setFont(g_font)
+            .setFont(getGlobalFont())
             
             .setButtonOnHover([&]()
             {

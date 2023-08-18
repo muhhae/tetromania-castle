@@ -44,12 +44,12 @@ inline enumScene g_currentScene = enumScene::menu;
 
 inline GameScreen g_screen;
 inline int g_score = 0;
-inline sf::Font g_font;
 inline sf::Color g_screenColor = sf::Color(39, 38, 56, 255);
 
 sf::Texture& getTexture(const std::string & path);
 
 void initScreen(sf::View & view);
+sf::Font& getGlobalFont();
 
 
 

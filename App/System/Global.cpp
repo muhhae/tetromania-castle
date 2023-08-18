@@ -23,3 +23,11 @@ void initScreen(sf::View & view)
     g_screen.width = view.getSize().x;
     g_screen.height = view.getSize().y;
 }
+
+sf::Font & getGlobalFont()
+{
+    static sf::Font font;
+    if (font.getInfo().family == "")
+        font.loadFromFile(firaFontPath);
+    return font;
+}

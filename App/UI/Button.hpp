@@ -32,7 +32,7 @@ public:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
     sf::RectangleShape m_button = sf::RectangleShape(sf::Vector2f(100, 50));
-    sf::Text m_text = sf::Text("Button", g_font, 20);
+    sf::Text m_text = sf::Text("Button", getGlobalFont(), 20);
     sf::Font m_font;
     
     std::function<void()> m_onClick;

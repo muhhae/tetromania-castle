@@ -24,13 +24,13 @@ void GameplayScene::run(sf::RenderWindow& window)
     bg_overlay.setOrigin(bg_overlay.getLocalBounds().width / 2, bg_overlay.getLocalBounds().height / 2);
     bg_overlay.setPosition(0, 0);
     
-    scoreText.setFont(g_font);
+    scoreText.setFont(getGlobalFont());
     scoreText.setColor(sf::Color::White);
     scoreText.setPosition(g_screen.left + 10, g_screen.top + 10);
     scoreText.setCharacterSize(50);
     
     sf::Text fpsText;
-    fpsText.setFont(g_font);
+    fpsText.setFont(getGlobalFont());
     fpsText.setColor(sf::Color::White);
     fpsText.setPosition(g_screen.left + 10, g_screen.top + 60);
     fpsText.setCharacterSize(20);
@@ -69,7 +69,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             .setTextString("TRY AGAIN")
             .setTextSize(30)
             .setTextCenter()
-            .setFont(g_font)
+            .setFont(getGlobalFont())
             
             .setButtonOnHover([&]()
             {
@@ -95,7 +95,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             .setTextString("MAIN MENU")
             .setTextSize(30)
             .setTextCenter()
-            .setFont(g_font)
+            .setFont(getGlobalFont())
             
             .setButtonOnHover([&]()
             {
@@ -122,7 +122,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             .setTextString("QUIT")
             .setTextSize(30)
             .setTextCenter()
-            .setFont(g_font)
+            .setFont(getGlobalFont())
             
             .setButtonOnHover([&]()
             {
@@ -305,7 +305,7 @@ void GameplayScene::run(sf::RenderWindow& window)
                 {
                     window.draw(pauseBackground);
                     
-                    sf::Text pauseText = sf::Text("PAUSE", g_font, 80);
+                    sf::Text pauseText = sf::Text("PAUSE", getGlobalFont(), 80);
                     pauseText.setColor(sf::Color::White);
                     pauseText.setOrigin(pauseText.getLocalBounds().width / 2, pauseText.getLocalBounds().height / 2);
                     pauseText.setPosition(0, -100);
@@ -333,7 +333,7 @@ void GameplayScene::run(sf::RenderWindow& window)
                     window.close();
             }
             sf::Text loseText;
-            loseText.setFont(g_font);
+            loseText.setFont(getGlobalFont());
             loseText.setColor(sf::Color::White);
             loseText.setCharacterSize(50);
             loseText.setString("GAME OVER");
@@ -341,7 +341,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             loseText.setPosition(0, -150);
             
             sf::Text scoreText;
-            scoreText.setFont(g_font);
+            scoreText.setFont(getGlobalFont());
             scoreText.setColor(sf::Color::White);
             scoreText.setCharacterSize(30);
             scoreText.setString("Your score: " + std::to_string(g_score));
