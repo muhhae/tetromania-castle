@@ -29,7 +29,7 @@ project "App"
         "App",
     }
     defines {
-        "SFML_STATIC"
+        "SFML_STATIC",
     }
 
     characterset ("Unicode") --unicode for windows

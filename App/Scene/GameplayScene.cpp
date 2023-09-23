@@ -66,7 +66,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             .setButtonTexture(getTexture(buttonTexturePath))
             
             .setTextPosition(sf::Vector2f(0, 95))
-            .setTextString("TRY AGAIN")
+            .setTextString("RESTART")
             .setTextSize(30)
             .setTextCenter()
             .setFont(getGlobalFont())
@@ -79,6 +79,7 @@ void GameplayScene::run(sf::RenderWindow& window)
             .setButtonOnClick([&]()
             {
                 restart();
+                TimeScale = 1;
             })
             .setButtonOnUpdate([&]()
             {

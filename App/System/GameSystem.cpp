@@ -7,7 +7,8 @@
 void Game::run()
 {   
     sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(600, 800), "Tetromino Castle", sf::Style::Close);
-    sf::View view(sf::Vector2f(0, 0), sf::Vector2f(window.getSize()));   
+    sf::View view(sf::Vector2f(0, 0), sf::Vector2f(600,800));
+    // view.setViewport(sf::FloatRect(0, 0, 0.4, 1));
     window.setView(view);
     
     initScreen(view);

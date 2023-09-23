@@ -31,3 +31,14 @@ sf::Font & getGlobalFont()
         font.loadFromFile(firaFontPath);
     return font;
 }
+
+sf::Font & getFont(const std::string& path)
+{
+    static std::map<std::string, sf::Font> fonts;
+    if (fonts.find(path) == fonts.end())
+    {
+        fonts[path] = sf::Font();
+        fonts[path].loadFromFile(path);
+    }
+    return fonts[path];
+}

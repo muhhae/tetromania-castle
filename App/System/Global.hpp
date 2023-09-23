@@ -15,6 +15,7 @@ const static std::string g_musicPath = g_resourcePath + "Musics/";
 const static std::string g_soundPath = g_resourcePath + "Sounds/";
 
 const static std::string firaFontPath = g_fontPath + "firaFont.ttf";
+const static std::string minimalPixelFontPath = g_fontPath + "MinimalPixel-v2.ttf";
 const static std::string castleBackgroundPath = g_backgroundPath + "bg_1.png";
 const static std::string blockTexturePath = g_blockPath + "block_1.png";
 const static std::string buttonTexturePath = g_buttonPath + "button.png";

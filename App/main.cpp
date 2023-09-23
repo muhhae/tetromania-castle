@@ -1,5 +1,8 @@
+#define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
+
 #include "System/GameSystem.hpp"
 #include <filesystem>
+
 
 int main(const int argc, const char** argv)
 {
